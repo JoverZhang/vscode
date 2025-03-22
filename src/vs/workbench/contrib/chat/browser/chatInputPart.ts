@@ -546,8 +546,6 @@ export class ChatInputPart extends Disposable implements IHistoryNavigationWidge
 		} else if (this.location === ChatAgentLocation.EditingSession) {
 			this.setChatMode(ChatMode.Edit);
 		}
-
-		this.selectedToolsModel.reset();
 	}
 
 	logInputHistory(): void {
@@ -1016,7 +1014,7 @@ export class ChatInputPart extends Disposable implements IHistoryNavigationWidge
 		this.addFilesToolbar.context = { widget, placeholder: localize('chatAttachFiles', 'Search for files and context to add to your request') };
 		this._register(this.addFilesToolbar.onDidChangeMenuItems(() => {
 			if (this.cachedDimensions) {
-				this.layout(this.cachedDimensions.height, this.cachedDimensions.width);
+				this._onDidChangeHeight.fire();
 			}
 		}));
 	}
@@ -1353,7 +1351,7 @@ export class ChatInputPart extends Disposable implements IHistoryNavigationWidge
 	}
 }
 
-const historyKeyFn = (entry: IChatHistoryEntry) => JSON.stringify(entry);
+const historyKeyFn = (entry: IChatHistoryEntry) => JSON.stringify({ ...entry, state: { ...entry.state, chatMode: undefined } });
 
 function getLastPosition(model: ITextModel): IPosition {
 	return { lineNumber: model.getLineCount(), column: model.getLineLength(model.getLineCount()) + 1 };
